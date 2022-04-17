@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+{% load static %}
+
+<body>
+    {% block contenido %}
+    <script>
+        function abrir(url) {
+            open(url, '', 'top=50, left=150, width=1000, height=600');
+            /*window.location.reload();*/
+        }
+    </script>
+    <!-- Start Header Top Area -->
+    <div class="header-top-area">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                    <div class="logo-area">
+                        <a href="{% url 'gEnergetica:profile' %}"><img src="{% static 'img/logo/logo.png' %}" alt="" /></a>
+                    </div>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
+                    <div class="header-top-menu">
+                        <ul class="nav navbar-nav notika-top-nav">
+                            <li class="nav-item"><a href="#" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle"><span><i class="notika-icon notika-form"></i></span></a>
+                                <div role="menu" class="dropdown-menu message-dd chat-dd animated zoomIn">
+                                    <div class="hd-message-info">
+                                        <a href="{% url 'gEnergetica:datosMetro' %}">
+                                            <div class="hd-message-sn">
+                                                <div class="hd-message-img chat-img">
+                                                    <i class="notika-icon notika-edit"></i>
+                                                </div>
+                                                <div class="hd-mg-ctn">
+                                                    <h3>Adicionar Datos de Metro Contador</h3>
+                                                    <p>datos metro contador</p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <a href="{% url 'gEnergetica:datosAmr' %}">
+                                            <div class="hd-message-sn">
+                                                <div class="hd-message-img chat-img">
+                                                    <i class="notika-icon notika-edit"></i>
+                                                </div>
+                                                <div class="hd-mg-ctn">
+                                                    <h3>Adicionar lecturas de metro contador</h3>
+                                                    <p>datos AMR</p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="nav-item"><a href="#" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle"><span><i class="notika-icon notika-app"></i></span></a>
+                                <div role="menu" class="dropdown-menu message-dd chat-dd animated zoomIn">
+                                    <div class="hd-message-info">
+                                        <a href="{% url 'admin:index' %}">
+                                            <div class="hd-message-sn">
+                                                <div class="hd-message-img chat-img">
+                                                    <i class="notika-icon notika-bar-chart"></i>
+                                                </div>
+                                                <div class="hd-mg-ctn">
+                                                    <h3>Predicciones</h3>
+                                                    <p>cálculos predictivos</p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="nav-item"><a href="#" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle"><span><i class="notika-icon notika-support"></i></span></a>
+                                <div role="menu" class="dropdown-menu message-dd chat-dd animated zoomIn">
+                                    <div class="hd-message-info">
+                                        <a href="{% url 'admin:index' %}">
+                                            <div class="hd-message-sn">
+                                                <div class="hd-message-img chat-img">
+                                                    <i class="notika-icon notika-settings"></i>
+                                                </div>
+                                                <div class="hd-mg-ctn">
+                                                    <h3>Administración</h3>
+                                                    <p>modifica todo a tu antojo</p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <a href="{% url 'gEnergetica:logout' %}">
+                                            <div class="hd-message-sn">
+                                                <div class="hd-message-img chat-img">
+                                                    <i class="notika-icon notika-close"></i>
+                                                </div>
+                                                <div class="hd-mg-ctn">
+                                                    <h3>Salir</h3>
+                                                    <p>cierra seccion</p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Header Top Area -->
+      <!-- Form Examples area start-->
+    <div class="form-example-area">
+        <div class="container">
+            <div class="row">
+                <form method="post" action="">
+                    {% csrf_token %}
+                    {% if okMensaje %}
+                        <div class="alert alert-success mg-tb-30">
+                            <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true"></span><span
+                                class="sr-only">Close</span><i class="notika-icon notika-close"></i></button>
+                            {{ okMensaje }}
+                        </div>
+                    {% endif %}
+                    {% if form.errors %}
+							{% for field in form %}
+								{% for error in field.errors %}
+									<div class="alert alert-danger">
+										<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+										<strong>{{ error|escape }}</strong>
+									</div>
+								{% endfor %}
+							{% endfor %}
+							{% for error in form.non_field_errors %}
+								<div class="alert alert-danger">
+									<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+									<strong>{{ error|escape }}</strong>
+								</div>
+							{% endfor %}
+						{% endif %}
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 mg-tb-30">
+                    <div class="form-element-list">
+                        <div class="basic-tb-hd">
+                            <h2>Metro Contador</h2>
+                            <p>Adicionar los datos de cada metro contador.</p>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                 <label></label>
+                                <div class="form-group ic-cmp-int form-elet-mg res-mg-fcs">
+                                    <div class="chosen-select-act fm-cmp-mg">
+                                        {{form.amrContador}}
+                                    </div>
+                                    <div class="form-ic-cmp">
+                                        <a href="javascript:abrir('{% url 'gEnergetica:datosMetro' %}')"><i class="notika-icon notika-edit" data-trigger="hover" data-toggle="popover" data-placement="top" data-content="Adiciona un metro contador con sus datos principales." title="" data-original-title="Adicionar metro contador"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                <label></label>
+                                        <div class="nk-int-st">
+                                            <input type="text" class="form-control" placeholder="Tiempo de Lectura">
+                                        </div>
+                            </div>  
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                 <label></label>
+                                <div class="nk-int-st">
+                                     {{form.totalImpEnerg}}
+                                        <!-- <input type="number" class="form-control" placeholder="Total importe de energía activa (kWh)"> -->
+                                    </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                <label></label>
+                                        <div class="nk-int-st">
+                                            {{form.t1ImpEnerg}}
+                                        </div>
+                            </div>  
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                <label></label>
+                                        <div class="nk-int-st">
+                                            {{form.t2ImpEnerg}}
+                                        </div>
+                            </div>  
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                <label></label>
+                                        <div class="nk-int-st">
+                                            {{form.t3ImpEnerg}}
+                                        </div>
+                            </div>  
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                 <label></label>
+                                <div class="nk-int-st">
+                                        {{form.totalExpEnerg}}
+                                    </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                <label></label>
+                                        <div class="nk-int-st">
+                                            {{form.t1ExpEnerg}}
+                                        </div>
+                            </div>  
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                <label></label>
+                                        <div class="nk-int-st">
+                                            {{form.t2ExpEnerg}}
+                                        </div>
+                            </div>  
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                <label></label>
+                                        <div class="nk-int-st">
+                                            {{form.t3ExpEnerg}}
+                                        </div>
+                            </div>  
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                 <label></label>
+                                <div class="nk-int-st">
+                                        {{form.totalImpReacEnerg}}
+                                    </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                <label></label>
+                                        <div class="nk-int-st">
+                                            {{form.t1ImpMaxDeman}}
+                                        </div>
+                            </div>  
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                <label></label>
+                                        <div class="nk-int-st">
+                                            {{form.t2ImpMaxDeman}}
+                                        </div>
+                            </div>  
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                <label></label>
+                                        <div class="nk-int-st">
+                                            {{form.t3ImpMaxDeman}}
+                                        </div>
+                            </div>  
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                <label></label>
+                                        <div class="nk-int-st">
+                                            {{form.t1ExpMaxDeman}}
+                                        </div>
+                            </div>  
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                <label></label>
+                                        <div class="nk-int-st">
+                                            {{form.t2ExpMaxDeman}}
+                                        </div>
+                            </div>  
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                <label></label>
+                                        <div class="nk-int-st">
+                                            {{form.t3ExpMaxDeman}}
+                                        </div>
+                            </div>  
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                <label></label>
+                                        <div class="nk-int-st">
+                                            {{form.imporActPoder}}
+                                        </div>
+                            </div>  
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                <label></label>
+                                        <div class="nk-int-st">
+                                            {{form.exporActPoder}}
+                                        </div>
+                            </div>  
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <label></label>
+                                        <div class="nk-int-st">
+                                            {{form.factPoder}}
+                                        </div>
+                            </div>  
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                <label></label>
+                                        <div class="nk-int-st">
+                                            {{form.faceAVolt}}
+                                        </div>
+                            </div> 
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                <label></label>
+                                        <div class="nk-int-st">
+                                            {{form.faceBVolt}}
+                                        </div>
+                            </div>  
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                <label></label>
+                                        <div class="nk-int-st">
+                                            {{form.faceCVolt}}
+                                        </div>
+                            </div>   
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                <label></label>
+                                        <div class="nk-int-st">
+                                            {{form.faceACurr}}
+                                        </div>
+                            </div> 
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                <label></label>
+                                        <div class="nk-int-st">
+                                            {{form.faceBCurr}}
+                                        </div>
+                            </div>  
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                <label></label>
+                                        <div class="nk-int-st">
+                                            {{form.faceCCurr}}
+                                        </div>
+                            </div>   
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 mg-tb-30">
+                                
+                              <button class="btn btn-success notika-btn-success">Adicionar</button>
+                            </div> 
+                        </div>
+                    </div>
+                    </div>
+                </form>
+            </div>   
+        </div>
+    </div>
+    <!-- Form Examples area End-->
+    {% endblock contenido %}   
+</body>

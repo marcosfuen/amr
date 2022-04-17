@@ -1,0 +1,114 @@
+stages:
+  - build
+  - test
+  - deploy
+
+include:
+  - template: 'Workflows/Branch-Pipelines.gitlab-ci.yml'
+  - project: 'ucdev/docker-deployer'
+    file: 'templates/.docker-deploy.yml'
+
+.build: &build
+  image: docker:latest
+  stage: build
+  before_script:
+    - docker info
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - docker build --pull -t "$APP_IMAGE" -f $DOCKERFILE .
+    - docker push -q "$APP_IMAGE"
+
+build-test:
+  <<: *build
+  variables:
+    APP_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+    DOCKERFILE: Dockerfile
+  except:
+    - master
+
+build-cron-test:
+  <<: *build
+  variables:
+    APP_IMAGE: $CI_REGISTRY_IMAGE/cron:$CI_COMMIT_REF_SLUG
+    DOCKERFILE: Dockerfile.cron
+  except:
+    - master
+
+build-production:
+  <<: *build
+  variables:
+    APP_IMAGE: $CI_REGISTRY_IMAGE:latest
+    DOCKERFILE: Dockerfile
+  only:
+    - master
+
+build-cron-production:
+  <<: *build
+  variables:
+    APP_IMAGE: $CI_REGISTRY_IMAGE/cron:latest
+    DOCKERFILE: Dockerfile.cron
+  only:
+    - master
+
+.test: &test
+  image:
+    name: $APP_IMAGE
+    entrypoint: [""]
+  stage: test
+  services:
+    # Usar sevicio de Postgres
+    - name: postgres:12.0
+      alias: db
+  before_script:
+    # Instalar coverage
+    - pip install coverage
+    # Aplicar migrations
+    - python manage.py migrate
+  script:
+    # Ejecutar las pruebas (+coverage)
+    - coverage run --source='.' manage.py test
+    # Generar test coverage report
+    - coverage report
+  # Conservar cache de PIP entre builds
+  # http://docs.gitlab.com/ce/ci/yaml/README.html#cache
+  cache:
+    paths:
+    - ~/.cache/pip/
+  # Text coverage report (regex tested on https://rubular.com/)
+  coverage: '/^TOTAL.+?(\d+\%)$/'
+
+test:
+  <<: *test
+  variables:
+    POSTGRES_DB: db
+    POSTGRES_PASSWORD: password
+    POSTGRES_USER: user
+    DATABASE_URL: postgres://user:password@db/db
+    APP_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+  except:
+    - master
+
+.deploy: &deploy
+  extends: .docker-deploy
+  stage: deploy
+  script:
+    - echo $CI_DEPLOY_PASSWORD | docker login --username $CI_DEPLOY_USER --password-stdin $CI_REGISTRY
+    - docker-compose --file docker-compose.yml config > interpolated-docker-compose.yml
+    - docker stack deploy --compose-file interpolated-docker-compose.yml --with-registry-auth $APP_NAME
+
+deploy:
+  <<: *deploy
+  variables:
+    APP_NAME: $CI_PROJECT_NAME
+    APP_IMAGE: $CI_REGISTRY_IMAGE:latest
+    APP_CRON_IMAGE: $CI_REGISTRY_IMAGE/cron:latest
+    APP_HOST: $PRODUCTION_DOMAIN
+    DEBUG: 'False'
+    ALLOWED_HOSTS: $PRODUCTION_DOMAIN
+    DATABASE_URL: $PRODUCTION_DATABASE_URL
+    MAIL_URL: $PRODUCTION_MAIL_URL
+  environment:
+    name: production
+    url: http://$PRODUCTION_DOMAIN
+  only:
+    - master
